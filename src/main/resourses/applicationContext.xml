@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
+
+    <!--开启注解扫描，扫描service和dao,controller不需要spring框架去管理-->
+    <context:component-scan base-package="com.guang">
+        <!--配置那些注解不需要扫描-->
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"></context:exclude-filter>
+    </context:component-scan>
+
+
+
+    <!--Spring整合Mybatis框架-->
+    <!--配置连接池-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql:///ssm"/>
+        <property name="username" value="root"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <!--配置SqlSessionFactor工厂-->
+    <!--没配置工厂之前，创建的是SqlMapConfig，MybatisTest测试的时候，
+    每次都要先创建工厂，
+    因为工厂能够给我们创建SqlSession,有了SqlSession就可以通过SqlSession拿到代理对象。
+    现在我们直接在applicationContext.xml中配置SqlSessionFactory工厂，
+    这就相当于IOC容器中有了工厂，就可以去创建SqlSession，进而通过SqlSession拿到代理对象，
+    没必要每次测试都去创建工厂-->
+    <bean id="sqlSessionFactor" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置IAccountDao接口所在的包-->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.guang.dao"/>
+    </bean>
+
+</beans>
